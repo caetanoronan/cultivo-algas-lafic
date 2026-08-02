@@ -4,7 +4,7 @@ Projeto do LAFIC/UFSC com uma página principal em HTML, gráficos e desenhos ex
 
 ## Estrutura
 
-- `index.html`: entrada principal do projeto.
+- `index.html`: hub de entrada do projeto, com links para o frontend principal e para o app de bancada.
 - `experimento_entressafra.html`: página completa do experimento com seções e ativos.
 - `Graficos/`, `Ciclo_vida/`, `desenho_experimento/`: imagens usadas na página.
 - `app/`: backend com `server.js` e `package.json`.
@@ -21,7 +21,7 @@ Abra `index.html` no navegador ou publique a raiz do repositório no GitHub Page
 3. Em `Build and deployment`, selecione `Deploy from a branch`.
 4. Escolha a branch `main` e a pasta `/ (root)`.
 
-O arquivo `index.html` já encaminha para `experimento_entressafra.html`.
+O arquivo `index.html` apresenta os dois acessos principais: o experimento e o app.
 
 ## Como executar o backend
 
