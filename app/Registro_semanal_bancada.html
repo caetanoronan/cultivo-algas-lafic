@@ -291,9 +291,9 @@
 
     <div class="status-card">
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('add-measurement')">📝 Registrar Medição</button>
-        <button class="tab" onclick="switchTab('history')">📋 Histórico de Medições</button>
-        <button class="tab" onclick="switchTab('dashboard')">📊 Resumo do Experimento</button>
+        <button class="tab active" onclick="switchTab('add-measurement', event)">📝 Registrar Medição</button>
+        <button class="tab" onclick="switchTab('history', event)">📋 Histórico de Medições</button>
+        <button class="tab" onclick="switchTab('dashboard', event)">📊 Resumo do Experimento</button>
       </div>
 
       <!-- ABA: REGISTRAR MEDIÇÃO -->
@@ -433,17 +433,21 @@
   </footer>
 
   <script>
-    // Banco de dados em memória para demonstração
+    const API_BASE_URL = '';
+
+    // Banco de dados carregado da API quando disponível
     let measurements = [];
 
     // Definir data de hoje no formulário
     document.querySelector('input[type="date"]').valueAsDate = new Date();
 
-    function switchTab(tabName) {
+    async function switchTab(tabName, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
       document.getElementById(tabName).classList.add('active');
-      event.target.classList.add('active');
+      if (evt && evt.currentTarget) {
+        evt.currentTarget.classList.add('active');
+      }
 
       if (tabName === 'history') renderTable();
       if (tabName === 'dashboard') updateDashboard();
@@ -460,18 +464,18 @@
     function renderTable() {
       const tbody = document.querySelector('#measurementsTable tbody');
       if (measurements.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada. (Verifique o backend se for integrar à API)</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada ainda.</td></tr>';
         return;
       }
       
       tbody.innerHTML = measurements.map(m => `
         <tr>
-          <td>${m.data.split('-').reverse().join('/')}</td>
-          <td><strong>${m.frasco}</strong></td>
-          <td><span class="${getEspecieBadge(m.especie)}">${m.especie}</span></td>
-          <td>${m.tratamento}</td>
-          <td>${parseFloat(m.peso).toFixed(3)}</td>
-          <td>${m.fvfm ? parseFloat(m.fvfm).toFixed(3) : '-'}</td>
+          <td>${m.dataMedicao ? m.dataMedicao.split('-').reverse().join('/') : '-'}</td>
+          <td><strong>${m.flaskId || '-'}</strong></td>
+          <td><span class="${getEspecieBadge(m.especie || '')}">${m.especie || '-'}</span></td>
+          <td>${m.tratamento || '-'}</td>
+          <td>${m.pesoUmido != null ? Number(m.pesoUmido).toFixed(3) : '-'}</td>
+          <td>${m.fvfm != null ? Number(m.fvfm).toFixed(3) : '-'}</td>
           <td>${m.salinidade || '-'}</td>
           <td>${m.responsavel || '-'}</td>
         </tr>
@@ -485,16 +489,16 @@
       document.getElementById('dashEspecies').textContent = especiesUnicas.size;
     }
 
-    function submitMeasurement(event) {
+    async function submitMeasurement(event) {
       event.preventDefault();
       const formData = new FormData(event.target);
       
       const dataObj = {
-        frasco: formData.get('frasco'),
-        data: formData.get('data'),
+        flaskId: formData.get('frasco'),
+        dataMedicao: formData.get('data'),
         especie: formData.get('especie'),
         tratamento: formData.get('tratamento'),
-        peso: formData.get('peso'),
+        pesoUmido: Number(formData.get('peso')),
         fvfm: formData.get('fvfm'),
         salinidade: formData.get('salinidade'),
         temperatura: formData.get('temperatura'),
@@ -502,18 +506,27 @@
         responsavel: formData.get('responsavel')
       };
 
-      // Adiciona na memória local (substituir por fetch POST para sua API depois)
-      measurements.push(dataObj);
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/measurements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataObj)
+        });
 
-      showAlert('formAlerts', '✅ Medição salva com sucesso!', 'success');
-      
-      // Limpa os campos biométricos mas mantém os dados fixos
-      event.target.querySelector('input[name="peso"]').value = '';
-      event.target.querySelector('input[name="fvfm"]').value = '';
-      event.target.querySelector('input[name="frasco"]').value = '';
-      event.target.querySelector('textarea').value = '';
-      
-      event.target.querySelector('input[name="frasco"]').focus();
+        if (!response.ok) {
+          const error = await response.json().catch(() => ({}));
+          throw new Error(error.error || 'Falha ao registrar medição');
+        }
+
+        showAlert('formAlerts', '✅ Medição enviada para o Notion com sucesso!', 'success');
+        await loadMeasurements();
+
+        event.target.reset();
+        document.querySelector('input[name="data"]').valueAsDate = new Date();
+        event.target.querySelector('input[name="frasco"]').focus();
+      } catch (error) {
+        showAlert('formAlerts', `❌ ${error.message}`, 'error');
+      }
     }
 
     function showAlert(containerId, message, type) {
@@ -524,6 +537,28 @@
       container.innerHTML = '';
       container.appendChild(alert);
       setTimeout(() => alert.remove(), 3000);
+    }
+
+    async function loadMeasurements() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/measurements`);
+        if (!response.ok) {
+          throw new Error('API indisponível');
+        }
+
+        measurements = await response.json();
+        renderTable();
+        updateDashboard();
+        document.getElementById('apiStatus').classList.remove('error');
+        document.querySelector('.status-indicator').classList.remove('error');
+        document.querySelector('.status-text h3').textContent = 'API Conectada';
+        document.querySelector('.status-text p').textContent = 'Os dados estão sendo lidos diretamente do backend';
+      } catch (error) {
+        document.getElementById('apiStatus').classList.add('error');
+        document.querySelector('.status-indicator').classList.add('error');
+        document.querySelector('.status-text h3').textContent = 'Modo local';
+        document.querySelector('.status-text p').textContent = 'A API ainda não respondeu; o formulário continua disponível.';
+      }
     }
 
     // LÓGICA DE MODO ESCURO
@@ -547,6 +582,8 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
       updateBtnVisual(isDark);
     });
+
+    loadMeasurements();
   </script>
 </body>
 </html>

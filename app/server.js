@@ -8,6 +8,7 @@ const app = express();
 // Configurações de Segurança e JSON
 app.use(cors()); // Permite que o Vercel converse com o Render
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // Inicializa o cliente do Notion com a chave secreta
 const notion = new Client({ auth: process.env.NOTION_TOKEN });
@@ -16,6 +17,10 @@ const databaseId = process.env.NOTION_DATABASE_ID;
 // Rota de Health Check (para o indicador verde no seu HTML)
 app.get('/api/health', (req, res) => {
     res.status(200).json({ status: 'OK', message: 'Servidor LAFIC operante.' });
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/Registro_semanal_bancada.html');
 });
 
 // Rota POST: Recebe dados do frontend e envia para o Notion
