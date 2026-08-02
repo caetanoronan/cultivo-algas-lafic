@@ -11,28 +11,4 @@ services:
       - key: NOTION_TOKEN
         sync: false
       - key: CORS_ORIGIN
-        value: https://caetanoronan.github.io,https://pgrs-lafic-frontend.onrender.com
-
-staticSites:
-  - type: static
-    name: pgrs-lafic-frontend
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    publishDir: dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        fromService:
-          name: pgrs-lafic-backend
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
-  - type: static
-    name: pgrs-lafic-app
-    rootDir: app
-    buildCommand: npm install && npm run build
-    publishDir: dist
-    envVars:
-      - key: BACKEND_URL
-        fromService:
-          name: pgrs-lafic-backend
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://caetanoronan.github.io
