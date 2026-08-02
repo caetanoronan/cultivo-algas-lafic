@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: lafic-backend
+    runtime: node
+    rootDir: app
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NOTION_DATABASE_ID
+        value: 3b0d14c78a5680ef907cf5977a6148dd
+      - key: NOTION_TOKEN
+        sync: false

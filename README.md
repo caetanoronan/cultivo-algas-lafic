@@ -14,6 +14,15 @@ Projeto do LAFIC/UFSC com uma página principal em HTML, gráficos e desenhos ex
 
 Abra `index.html` no navegador ou publique a raiz do repositório no GitHub Pages.
 
+## Como publicar no GitHub Pages
+
+1. Deixe o repositório público.
+2. No GitHub, abra `Settings` > `Pages`.
+3. Em `Build and deployment`, selecione `Deploy from a branch`.
+4. Escolha a branch `main` e a pasta `/ (root)`.
+
+O arquivo `index.html` já encaminha para `experimento_entressafra.html`.
+
 ## Como executar o backend
 
 1. Entre na pasta `app/`.
@@ -30,6 +39,8 @@ Configure um Web Service Node com:
 - Build Command: `npm install`
 - Start Command: `npm start`
 - Variáveis de ambiente: `NOTION_DATABASE_ID` e `NOTION_TOKEN`
+
+Se preferir deploy automático, use o arquivo `render.yaml` da raiz do projeto. Ele aponta para a pasta `app/`.
 
 ## Observações
 
