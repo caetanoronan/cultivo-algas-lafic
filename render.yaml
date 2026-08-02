@@ -10,6 +10,8 @@ services:
         value: 3b0d14c78a5680ef907cf5977a6148dd
       - key: NOTION_TOKEN
         sync: false
+      - key: CORS_ORIGIN
+        value: https://caetanoronan.github.io,https://pgrs-lafic-frontend.onrender.com
 
 staticSites:
   - type: static

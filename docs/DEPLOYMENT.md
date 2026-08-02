@@ -7,6 +7,7 @@
 3. Build Command: `npm install`
 4. Start Command: `npm start`
 5. Defina `NOTION_TOKEN`, `NOTION_DATABASE_ID` e `CORS_ORIGIN`.
+	- Exemplo de `CORS_ORIGIN`: `https://caetanoronan.github.io,https://pgrs-lafic-frontend.onrender.com`
 6. Crie também o Static Site apontando para `frontend/`.
 7. Build Command do frontend: `npm install && npm run build`
 8. Publish Directory do frontend: `dist`
@@ -40,3 +41,4 @@ O frontend React aponta para a API do Render via `VITE_API_BASE_URL`.
 4. Depois crie o frontend estático no Render e aponte para a URL pública do backend.
 5. Depois crie o app de bancada estático no Render.
 6. Se preferir, publique o material estático no GitHub Pages e mantenha o backend no Render.
+7. O HTML do app já usa o backend do Render como fallback, então o GitHub Pages também consegue gravar no Notion quando o backend estiver online.
