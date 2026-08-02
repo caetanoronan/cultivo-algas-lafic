@@ -13,6 +13,15 @@
 9. Defina `VITE_API_BASE_URL` com a URL pública do backend do Render.
 10. O app só passa a gravar no Notion depois que essas variáveis estiverem salvas no painel do Render.
 
+## App de Bancada
+
+1. Crie um terceiro Static Site apontando para `app/`.
+2. Build Command: `npm install && npm run build`
+3. Publish Directory: `dist`
+4. Defina `BACKEND_URL` com a URL pública do backend do Render.
+5. O build gera o `index.html` da bancada já com a API do backend embutida.
+6. Esse app continua chamando a API pública do backend para gravar no Notion.
+
 ## GitHub Pages
 
 1. Publique a branch `main`.
@@ -29,4 +38,5 @@ O frontend React aponta para a API do Render via `VITE_API_BASE_URL`.
 2. Depois crie a integração e copie o token.
 3. Em seguida crie o serviço backend no Render, porque ele vai precisar do token e do database ID já prontos.
 4. Depois crie o frontend estático no Render e aponte para a URL pública do backend.
-5. Se preferir, publique o material estático no GitHub Pages e mantenha o backend no Render.
+5. Depois crie o app de bancada estático no Render.
+6. Se preferir, publique o material estático no GitHub Pages e mantenha o backend no Render.

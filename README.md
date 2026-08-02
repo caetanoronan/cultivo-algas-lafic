@@ -22,7 +22,7 @@ Projeto do LAFIC/UFSC com frontend principal em React, app de bancada em HTML/JS
 ## Deploy
 
 - GitHub Pages: publique a branch `main` na raiz do repositório para o material estático.
-- Render: publique `backend/` como Web Service e `frontend/` como Static Site.
+- Render: publique `backend/` como Web Service, `frontend/` como Static Site e `app/` como Static Site da bancada.
 - O frontend React usa `VITE_API_BASE_URL` para falar com o backend do Render.
 
 ## Notion
