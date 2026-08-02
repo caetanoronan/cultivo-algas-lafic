@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cultivo de Macroalgas Nativas na Entressafra - LAFIC/UFSC</title>
+    <style>
+        /* --- MANUTENÇÃO DO SEU DICIONÁRIO DE CORES E ESTILOS ORIGINAIS --- */
+        :root {
+            --cor-primaria: #005f73;
+            --cor-secundaria: #0a9396;
+            --cor-terciaria: #94d2bd;
+            --cor-fundo: #e9f7f5;
+            --cor-texto: #14213d;
+            --cor-destaque: #003845;
+            --bg-page-start: #e9f7f5;
+            --bg-page-end: #ffffff;
+            --surface: #ffffff;
+            --surface-soft: #f2fbfa;
+            --surface-alt: #edf9f7;
+            --border-soft: #cde8e2;
+            --border-strong: #dcefeb;
+            --shadow-1: rgba(0, 0, 0, 0.1);
+            --shadow-2: rgba(0, 0, 0, 0.06);
+            --row-hover: #f4fbfa;
+            --footer-bg: var(--cor-fundo);
+            --focus-ring: #f0b429;
+        }
+
+        body.dark-mode {
+            --cor-primaria: #4db3c8;
+            --cor-secundaria: #49d0cf;
+            --cor-terciaria: #2f7078;
+            --cor-fundo: #0f1b24;
+            --cor-texto: #e2edf5;
+            --cor-destaque: #9be5f3;
+            --bg-page-start: #0a1218;
+            --bg-page-end: #111d27;
+            --surface: #162430;
+            --surface-soft: #1b2e3b;
+            --surface-alt: #213947;
+            --border-soft: #2f4a5a;
+            --border-strong: #365465;
+            --shadow-1: rgba(0, 0, 0, 0.35);
+            --shadow-2: rgba(0, 0, 0, 0.28);
+            --row-hover: #1e3442;
+            --footer-bg: #0e1a22;
+            --focus-ring: #ffd166;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-page-start) 0%, var(--bg-page-end) 100%);
+            color: var(--cor-texto);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        header {
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+            margin-bottom: 30px;
+        }
+
+        body.dark-mode header { background: linear-gradient(135deg, #0f2a36 0%, #174453 100%); }
+
+        header h1 { font-size: 2.3em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25); }
+        header p { font-size: 1.15em; opacity: 0.96; }
+        .subtitle { font-size: 1em; margin-top: 8px; font-weight: 300; }
+        .key-message { font-size: 0.98em; margin-top: 10px; font-weight: 600; opacity: 0.96; }
+
+        .tabs {
+            display: flex;
+            background-color: var(--surface);
+            border-radius: 10px 10px 0 0;
+            overflow-x: auto;
+            box-shadow: 0 2px 4px var(--shadow-1);
+        }
+
+        .tab-button {
+            flex: 1; padding: 15px 25px; background: var(--surface); border: none;
+            border-bottom: 3px solid transparent; cursor: pointer; font-size: 1.03em;
+            font-weight: 600; color: var(--cor-primaria); transition: all 0.25s ease; white-space: nowrap;
+        }
+
+        .tab-button:hover { background-color: var(--cor-fundo); }
+        .tab-button.active {
+            background-color: var(--cor-fundo); border-bottom-color: var(--cor-primaria); color: var(--cor-destaque);
+        }
+
+        .tab-content {
+            display: none; background: var(--surface); padding: 40px;
+            border-radius: 0 0 10px 10px; box-shadow: 0 4px 6px var(--shadow-1); min-height: 560px;
+        }
+
+        .tab-content.active { display: block; animation: fadeIn 0.45s; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { color: var(--cor-primaria); font-size: 2em; margin-bottom: 20px; border-bottom: 3px solid var(--cor-secundaria); padding-bottom: 10px; }
+        h3 { color: var(--cor-secundaria); font-size: 1.45em; margin: 28px 0 14px 0; }
+        h4 { color: var(--cor-primaria); font-size: 1.15em; margin: 18px 0 10px 0; }
+        p { margin: 10px 0; }
+
+        .info-card {
+            background: var(--cor-fundo); border-left: 5px solid var(--cor-primaria);
+            padding: 20px; margin: 20px 0; border-radius: 6px; box-shadow: 0 2px 4px var(--shadow-2);
+        }
+
+        .info-card strong { color: var(--cor-destaque); }
+
+        .areas-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px; margin: 25px 0;
+        }
+
+        .area-card {
+            background: linear-gradient(135deg, var(--cor-fundo) 0%, var(--surface) 100%);
+            border: 2px solid var(--cor-terciaria); border-radius: 10px; padding: 22px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .area-card:hover { transform: translateY(-4px); box-shadow: 0 7px 14px rgba(0, 95, 115, 0.18); }
+
+        ul, ol { margin: 12px 0 12px 26px; }
+        li { margin: 8px 0; line-height: 1.75; }
+
+        table { width: 100%; border-collapse: collapse; margin: 18px 0; background: var(--surface); box-shadow: 0 2px 4px var(--shadow-1); }
+        th { background: var(--cor-primaria); color: #ffffff; padding: 12px; text-align: left; font-weight: 600; }
+        td { padding: 11px 12px; border-bottom: 1px solid var(--border-strong); }
+        tr:hover { background-color: var(--row-hover); }
+
+        .badge { display: inline-block; padding: 4px 11px; background: var(--cor-secundaria); color: #ffffff; border-radius: 18px; font-size: 0.85em; font-weight: 700; margin-right: 8px; }
+
+        .destaque-box {
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            color: #ffffff; padding: 28px; border-radius: 10px; margin: 24px 0; box-shadow: 0 6px 12px rgba(0, 95, 115, 0.28);
+        }
+
+        .destaque-box h3 { color: #ffffff; border-bottom: 2px solid rgba(255, 255, 255, 0.35); padding-bottom: 8px; }
+        .destaque-box p { color: #ffffff; }
+
+        .mapa-container { margin: 30px 0; text-align: center; background: var(--surface-soft); padding: 15px; border-radius: 10px; border: 1px solid var(--border-soft); }
+        .mapa-container img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); }
+        .mapa-caption { margin-top: 12px; font-style: italic; color: var(--cor-secundaria); font-size: 0.95em; }
+
+        .theme-toggle {
+            margin-top: 16px; border: 1px solid rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.16);
+            color: #ffffff; border-radius: 999px; padding: 8px 14px; font-weight: 700; font-size: 0.9em;
+            cursor: pointer; transition: background 0.2s ease;
+        }
+        .theme-toggle:hover { background: rgba(255, 255, 255, 0.25); }
+
+        footer { text-align: center; padding: 28px; margin-top: 45px; background: var(--footer-bg); border-top: 3px solid var(--cor-primaria); }
+
+        @media (max-width: 768px) {
+            .tabs { flex-direction: column; }
+            .tab-button { border-bottom: 1px solid var(--border-strong); border-left: 3px solid transparent; }
+            .tab-button.active { border-left-color: var(--cor-primaria); border-bottom-color: var(--border-strong); }
+            .areas-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🌿 Cultivo de Macroalgas Nativas na Entressafra</h1>
+    <p>Plano Operacional e Delineamento Experimental</p>
+    <p class="subtitle">Laboratório de Ficologia - LAFIC/UFSC</p>
+    <p class="key-message"><strong>Foco:</strong> Viabilidade climática, rotina laboratorial e biologia aplicada.</p>
+    <button id="theme-toggle" class="theme-toggle" type="button" onclick="toggleTheme()">Ativar modo escuro</button>
+</header>
+
+<div class="container">
+    <div class="tabs" role="tablist">
+        <button class="tab-button active" onclick="openTab(event, 'visao-geral')">📋 Visão Geral</button>
+        <button class="tab-button" onclick="openTab(event, 'oceanografia')">🌊 Oceanografia</button>
+        <button class="tab-button" onclick="openTab(event, 'in-vitro')">🧪 In Vitro (Delineamento)</button>
+        <button class="tab-button" onclick="openTab(event, 'especies')">🌱 Biologia das Espécies</button>
+        <button class="tab-button" onclick="openTab(event, 'operacional')">⚙️ Plano Operacional</button>
+        <button class="tab-button" onclick="openTab(event, 'pgrs')">♻️ PGRS e Biossegurança</button>
+    </div>
+
+    <!-- ABA 1: VISÃO GERAL -->
+    <div id="visao-geral" class="tab-content active">
+        <h2>📋 Visão Geral e Hipótese</h2>
+
+        <div class="destaque-box">
+            <h3>Hipótese Central</h3>
+            <p style="font-size: 1.1em; line-height: 1.8;">
+                A entressafra do cultivo de <em>Kappaphycus alvarezii</em> — atualmente restrito à estação quente devido à sua baixa tolerância térmica — pode ser preenchida pelo cultivo de espécies nativas com maior tolerância ao frio, permitindo aos maricultores da região manter produção e renda ao longo de todo o ano[cite: 3].
+            </p>
+        </div>
+
+        <h3>Contexto: Mudanças Climáticas e Segurança Alimentar</h3>
+        <div class="info-card">
+            <ul>
+                <li>A aquicultura de macroalgas é um dos segmentos de mais rápido crescimento (mais de 32 milhões de toneladas anuais)[cite: 3].</li>
+                <li>Diferente da agricultura terrestre, não demanda água doce nem terra arável[cite: 3].</li>
+                <li>Bancos de cultivo atuam como sumidouros de carbono e atenuam localmente a acidificação da água[cite: 3].</li>
+            </ul>
+        </div>
+
+        <h3>O Gargalo em Santa Catarina</h3>
+        <div class="info-card">
+            <p>O cultivo comercial de <em>K. alvarezii</em> (autorizado pela IN IBAMA nº 1/2020) sofre com a sazonalidade na Baía Sul de Florianópolis[cite: 3]. Estudos locais mostram taxas de crescimento de 4,29% a 5,12% ao dia no verão, contra apenas 0,32% a 0,54% ao dia no inverno (resultando em perda de biomassa)[cite: 3].</p>
+        </div>
+
+        <h3>Espécies Candidatas</h3>
+        <div class="areas-grid">
+            <div class="area-card">
+                <h4>Chondracanthus teedei</h4>
+                <p>Produtora de carragenana (kappa/iota na fase gametofítica), candidata direta à diversificação da cadeia dominada pelo <em>Kappaphycus</em>[cite: 3].</p>
+            </div>
+            <div class="area-card">
+                <h4>Ulva spp.</h4>
+                <p>Uso consolidado como biofiltro em sistemas multitróficos (IMTA), robusta e com rápido ganho de biomassa oportunista[cite: 3].</p>
+            </div>
+            <div class="area-card">
+                <h4>Gracilaria sp.</h4>
+                <p>Uma das principais fontes comerciais de ágar mundialmente, com aplicações na indústria alimentícia e microbiológica[cite: 3].</p>
+            </div>
+            <div class="area-card">
+                <h4>Petalonia fascia</h4>
+                <p>Candidata exploratória de inverno; fase foliosa macroscópica se desenvolve no frio, com potencial para compostos como fucoxantina[cite: 3].</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 2: OCEANOGRAFIA -->
+    <div id="oceanografia" class="tab-content">
+        <h2>🌊 Levantamento Oceanográfico (SST)</h2>
+
+        <div class="info-card">
+            <p>Para contextualizar os parâmetros dos ensaios laboratoriais, foi processada uma série temporal da Temperatura da Superfície do Mar (SST) entre 2014 e 2026 via Google Earth Engine, para o grid da Baía Sul de Florianópolis[cite: 3].</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Parâmetro Oceanográfico</th>
+                    <th>Valor Identificado</th>
+                    <th>Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Temperatura Máxima Absoluta</td>
+                    <td>28,62 °C</td>
+                    <td>Registrada em 15/01/2019[cite: 3].</td>
+                </tr>
+                <tr>
+                    <td>Temperatura Média Histórica</td>
+                    <td>22,11 °C</td>
+                    <td>Média de toda a série (2014–2026)[cite: 3].</td>
+                </tr>
+                <tr>
+                    <td>Temperatura Mínima Absoluta</td>
+                    <td>13,78 °C</td>
+                    <td>Registrada em 23/06/2016[cite: 3].</td>
+                </tr>
+                <tr>
+                    <td>Amplitude Térmica Anual</td>
+                    <td>11,4 °C (Média)</td>
+                    <td>Variação de ~9,9 °C a 13,5 °C nos anos completos[cite: 3].</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Flutuação Térmica Mensal</h3>
+        <div class="mapa-container">
+            <img src="Graficos/variacao_mensal_tem_sup_mar.png" alt="Gráfico de Variação Mensal da Temperatura da Superfície do Mar (2014-2026)">
+            <p class="mapa-caption">GRÁFICO 1: As temperaturas mais altas concentram-se em jan-fev (~26,3 °C) e as mais baixas em jul-ago (~17,9 °C)[cite: 3]. Áreas hachuradas indicam anos parciais (2014 e 2026)[cite: 3].</p>
+        </div>
+
+        <h3>Comportamento Anual Agrupado</h3>
+        <div class="mapa-container">
+            <img src="Graficos/resumo_anual_tem_sup_mar.png" alt="Gráfico de Resumo Anual de Temperaturas da Superfície do Mar">
+            <p class="mapa-caption">GRÁFICO 2: Resumo anual evidenciando a consistência do padrão térmico ao longo da década[cite: 3].</p>
+        </div>
+
+        <h3>Amplitude Térmica Anual</h3>
+        <div class="mapa-container">
+            <img src="Graficos/amplitude_termica_anual.png" alt="Gráfico de Amplitude Térmica Anual (Máxima - Mínima)">
+            <p class="mapa-caption">GRÁFICO 3: A amplitude calculada em cada ano civil reforça a drástica variação sazonal à qual o cultivo in vivo estará exposto[cite: 3].</p>
+        </div>
+    </div>
+
+    <!-- ABA 3: IN VITRO -->
+    <div id="in-vitro" class="tab-content">
+        <h2>🧪 Delineamento Experimental In Vitro</h2>
+
+        <div class="destaque-box">
+            <h3>Matriz Fatorial: Abordagem Híbrida</h3>
+            <p>Com base na série oceanográfica, a matriz reproduzirá a faixa térmica da Baía Sul em três níveis controlados distribuídos em duas salas (48 unidades experimentais)[cite: 3].</p>
+        </div>
+
+        <div class="areas-grid">
+            <div class="area-card">
+                <h4>❄️ T1: Inverno (Sala 1)</h4>
+                <p>Temperatura: 15 °C. Fotoperíodo curto (10h luz / 14h escuro) e baixa irradiância. Sala fisicamente isolada[cite: 3].</p>
+            </div>
+            <div class="area-card">
+                <h4>🌤️ T2: Transição (Sala 2)</h4>
+                <p>Temperatura: 22 °C (ambiente). Fotoperíodo intermediário (12h luz / 12h escuro)[cite: 3].</p>
+            </div>
+            <div class="area-card">
+                <h4>☀️ T3: Verão/Controle (Sala 2)</h4>
+                <p>Temperatura: 28 °C (banho-maria termostatizado). Fotoperíodo longo isolado por partição física (14h luz / 10h escuro)[cite: 3].</p>
+            </div>
+        </div>
+
+        <h3>Visualização Estrutural das Salas</h3>
+        
+        <div class="mapa-container">
+            <img src="desenho_experimento/Delinhamento_experimento_Sala_1.png" alt="Desenho técnico da Sala 1 - Cultivo climatizado a 15 graus">
+            <p class="mapa-caption">Sala 1: Tratamento de Inverno (15 °C), com frascos Erlenmeyer aerados por manifold central[cite: 3].</p>
+        </div>
+
+        <div class="mapa-container">
+            <img src="desenho_experimento/Delinhamento_experimento_Sala_2.png" alt="Desenho técnico da Sala 2 - Tratamentos de Transição e Verão com banho-maria">
+            <p class="mapa-caption">Sala 2: T2 (Transição a 22 °C à esquerda) e T3 (Verão a 28 °C em banho-maria à direita), isolados pela partição de fotoperíodo[cite: 3].</p>
+        </div>
+
+        <div class="mapa-container">
+            <img src="desenho_experimento/Delinhamento_experimento_geral.png" alt="Esquema diagramático do delineamento experimental com 48 unidades">
+            <p class="mapa-caption">Esquema geral de distribuição das 4 espécies × 4 réplicas em cada um dos 3 tratamentos térmicos[cite: 3].</p>
+        </div>
+    </div>
+
+    <!-- ABA 4: ESPÉCIES -->
+    <div id="especies" class="tab-content">
+        <h2>🌱 Biologia das Espécies e Ciclos de Vida</h2>
+
+        <div class="info-card">
+            <p>O entendimento minucioso dos ciclos biológicos é fundamental para a seleção e padronização das fases biológicas que atuarão como inóculos no experimento laboratorial e no espinhel (longline)[cite: 3].</p>
+        </div>
+
+        <h3>1. <em>Ulva</em> spp. (Alface-do-Mar)</h3>
+        <p>Ciclo diplobionte isomórfico. Rápida resposta a gatilhos de temperatura e capacidade oportunista para os meses de temperatura mínima absoluta (~13 °C a 15 °C)[cite: 3].</p>
+        <div class="mapa-container">
+            <img src="Ciclo_vida/Ciclo_vida_ulva_lactuca(alface_do_mar).png" alt="Pôster do Ciclo de Vida de Ulva lactuca">
+            <p class="mapa-caption">Alternância isomórfica de gerações (gametófito e esporófito) de <em>Ulva</em>[cite: 3].</p>
+        </div>
+
+        <h3>2. <em>Gracilaria</em> sp.</h3>
+        <p>Ciclo diplobionte trifásico isomórfico. A fase tetrasporofítica possui grande robustez ambiental (Abreu et al., 2011), acompanhada pelo monitoramento de PAM e pigmentos para aferir aclimatação[cite: 3].</p>
+        <div class="mapa-container">
+            <img src="Ciclo_vida/ciclo_vida_gracilaria_sp.png" alt="Pôster do Ciclo de Vida de Gracilaria sp.">
+            <p class="mapa-caption">Destaque para a formação do cistocarpo e liberação de tetrásporos em <em>Gracilaria</em>[cite: 3].</p>
+        </div>
+
+        <h3>3. <em>Chondracanthus teedei</em></h3>
+        <p>Ciclo trifásico isomórfico vital para o experimento: gametófitos sintetizam carragenana kappa/iota (gel duro) enquanto tetrasporófitos produzem lambda (espessante sem gel)[cite: 3].</p>
+        <div class="mapa-container">
+            <img src="Ciclo_vida/ciclo_vida_chondracanthus_teedei.png" alt="Pôster do Ciclo de Vida de Chondracanthus teedei">
+            <p class="mapa-caption">Diferenciação biotecnológica das carragenanas nas diferentes fases do ciclo[cite: 3].</p>
+        </div>
+
+        <h3>4. <em>Petalonia fascia</em></h3>
+        <p>Ciclo heteromórfico estratégico: uma crosta ralfsoide microscópica no verão e uma fase foliosa macroscópica impulsionada pela queda de temperatura no inverno (biomassa e fucoxantina)[cite: 3].</p>
+        <div class="mapa-container">
+            <img src="Ciclo_vida/ciclo_vida_petalonia.png" alt="Pôster do Ciclo de Vida de Petalonia fascia">
+            <p class="mapa-caption">Adaptação climática e gatilho térmico para o desenvolvimento das lâminas achatadas na <em>Petalonia</em>[cite: 3].</p>
+        </div>
+    </div>
+
+    <!-- ABA 5: PLANO OPERACIONAL -->
+    <div id="operacional" class="tab-content">
+        <h2>⚙️ Plano Operacional e Execução</h2>
+
+        <div class="destaque-box">
+            <h3>Preparação e Coleta</h3>
+            <p>Os espécimes serão coletados na Baía Sul, mantendo a representatividade genética e reduzindo estresse de transporte. Coleta em maré baixa, priorizando talos saudáveis sem necrose ou epifitismo[cite: 4].</p>
+        </div>
+
+        <h3>Estrutura e Equipamentos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Etapa</th>
+                    <th>Itens / Materiais</th>
+                    <th>Finalidade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Campo</td>
+                    <td>Caixa térmica, potes, água do local, espátulas, termômetro e GPS.</td>
+                    <td>Transporte estabilizado, retirada sem danos e registro do ponto exato[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Cultivo</td>
+                    <td>48 Erlenmeyers, provetas, pipetas volumétricas, sistema de aeração (manifold).</td>
+                    <td>Unidades experimentais e distribuição equilibrada de ar[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Dados</td>
+                    <td>Balança de precisão (0,01 g), Fluorômetro PAM, Espectrofotômetro e Dataloggers.</td>
+                    <td>Monitoramento biológico, fisiológico (TCE, Fv/Fm, pigmentos) e ambiental[cite: 4].</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Rotina de Laboratório</h3>
+        <div class="areas-grid">
+            <div class="area-card">
+                <h4>📅 Diária</h4>
+                <ul>
+                    <li>Verificar aeração ativa em cada frasco[cite: 4].</li>
+                    <li>Checar temperaturas do ar (salas) e da água (banho-maria)[cite: 4].</li>
+                    <li>Observação visual de necrose ou contaminações[cite: 4].</li>
+                </ul>
+            </div>
+            <div class="area-card">
+                <h4>📆 Semanal</h4>
+                <ul>
+                    <li>Pesagem do peso úmido para Taxa de Crescimento (TCE)[cite: 4].</li>
+                    <li>Medição não destrutiva de Fv/Fm via PAM[cite: 4].</li>
+                    <li>Troca do meio de cultura e aferição de salinidade[cite: 4].</li>
+                </ul>
+            </div>
+            <div class="area-card">
+                <h4>🛡️ Biossegurança NB-1</h4>
+                <ul>
+                    <li>Jaleco, calça e sapato fechado obrigatórios[cite: 4].</li>
+                    <li>Uso de luvas nitrílicas e capela de gases ao manusear solventes/formol[cite: 4].</li>
+                    <li>Descontaminação pré e pós com álcool 70%[cite: 4].</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABA 6: PGRS -->
+    <div id="pgrs" class="tab-content">
+        <h2>♻️ Descarte e Gestão de Resíduos (PGRS)</h2>
+
+        <div class="info-card">
+            <p>O fluxo a seguir é estabelecido pelas normas de gerenciamento de resíduos (PGRS preliminar) do LAFIC[cite: 4]. Não é permitido o descarte cruzado entre as classes.</p>
+        </div>
+
+        <div class="destaque-box" style="background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);">
+            <h3>⚠️ Ponto de Atenção: Inativação Química</h3>
+            <p>O LAFIC não dispõe de autoclave. A esterilização de preparo e o descarte de volumes líquidos exigem procedimentos químicos (Hipoclorito ou filtração), impossibilitando fervura contínua[cite: 4].</p>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Resíduo Gerado no Experimento</th>
+                    <th>Fluxo de Classificação</th>
+                    <th>Procedimento de Descarte Obrigatório</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Meio de cultura líquido usado</td>
+                    <td><span class="badge" style="background: #ef4444;">Infectante (Biológico)</span></td>
+                    <td>Inativar com Hipoclorito 1% (mín. 30 min) antes de descartar na pia com água abundante[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Biomassa de alga descartada</td>
+                    <td><span class="badge" style="background: #ef4444;">Infectante Sólido</span></td>
+                    <td>Acondicionar em <strong>Saco Vermelho</strong> etiquetado e solicitar Coleta Especial UFSC[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Vidrarias, lâminas e pipetas quebradas</td>
+                    <td><span class="badge" style="background: #f59e0b;">Perfurocortante</span></td>
+                    <td>Recolher com pinça/pá e depositar na <strong>Caixa Rígida Amarela (Descarpack)</strong>[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Solventes do espectrofotômetro</td>
+                    <td><span class="badge" style="background: #3b82f6;">Químico</span></td>
+                    <td>Bombona PEAD por compatibilidade (rótulo azul ou vermelho); solicitar coleta UFSC[cite: 4].</td>
+                </tr>
+                <tr>
+                    <td>Luvas, papel toalha (sem risco químico)</td>
+                    <td><span class="badge" style="background: #64748b;">Comum / Reciclável</span></td>
+                    <td>Saco branco (comum) ou verde/azul (reciclável)[cite: 4].</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Limpeza Final e Registros</h3>
+        <div class="info-card">
+            <ul>
+                <li><strong>Rotina de fechamento:</strong> Higienizar prateleiras, banho-maria e mangueiras de aeração após a retirada das unidades experimentais[cite: 4].</li>
+                <li><strong>Registro institucional:</strong> Ao final, a planilha de biometria e o registro rigoroso do volume de resíduos gerados devem ser entregues à coordenação do LAFIC, retroalimentando as estimativas de carga do laboratório[cite: 4].</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p><strong>Laboratório de Ficologia (LAFIC) | UFSC</strong></p>
+    <p>Projeto de Mestrado - Monitoramento Ecofisiológico de Macroalgas</p>
+</footer>
+
+<script>
+    function updateThemeButton() {
+        var btn = document.getElementById('theme-toggle');
+        if (!btn) return;
+        var dark = document.body.classList.contains('dark-mode');
+        btn.textContent = dark ? 'Ativar modo claro' : 'Ativar modo escuro';
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        updateThemeButton();
+    }
+
+    function toggleTheme() {
+        var next = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+        applyTheme(next);
+        window.localStorage.setItem('lafic-theme', next);
+    }
+
+    function openTab(evt, tabName) {
+        var contents = document.getElementsByClassName('tab-content');
+        for (var i = 0; i < contents.length; i++) contents[i].classList.remove('active');
+
+        var buttons = document.getElementsByClassName('tab-button');
+        for (var j = 0; j < buttons.length; j++) buttons[j].classList.remove('active');
+
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+    }
+
+    (function initTheme() {
+        var saved = window.localStorage.getItem('lafic-theme');
+        if (saved) { applyTheme(saved); return; }
+        applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    })();
+</script>
+
+</body>
+</html>
