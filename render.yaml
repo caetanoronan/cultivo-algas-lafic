@@ -10,3 +10,21 @@ services:
         value: 3b0d14c78a5680ef907cf5977a6148dd
       - key: NOTION_TOKEN
         sync: false
+      - key: CORS_ORIGIN
+        fromService:
+          name: pgrs-lafic-frontend
+          type: static
+          envVarKey: RENDER_EXTERNAL_URL
+
+staticSites:
+  - type: static
+    name: pgrs-lafic-frontend
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          name: pgrs-lafic-backend
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL

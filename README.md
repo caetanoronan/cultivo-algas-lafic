@@ -21,8 +21,9 @@ Projeto do LAFIC/UFSC com frontend principal em React, app de bancada em HTML/JS
 
 ## Deploy
 
-- GitHub Pages: publique a branch `main` na raiz do repositório ou use a build do frontend React depois do `npm run build`.
-- Render: use `backend/` como raiz do serviço, com `npm install` e `npm start`.
+- GitHub Pages: publique a branch `main` na raiz do repositório para o material estático.
+- Render: publique `backend/` como Web Service e `frontend/` como Static Site.
+- O frontend React usa `VITE_API_BASE_URL` para falar com o backend do Render.
 
 ## Notion
 
@@ -33,3 +34,4 @@ Projeto do LAFIC/UFSC com frontend principal em React, app de bancada em HTML/JS
 
 - O app de bancada precisa receber a URL base do backend do Render quando for publicado separadamente.
 - A migração React já deixa o projeto preparado para evoluir a UI sem perder o material estático existente.
+- O deploy completo fica online quando o backend, o frontend e a integração do Notion estiverem ativos ao mesmo tempo.
