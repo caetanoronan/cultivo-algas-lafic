@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.get('/', (req, res) => {
   res.json({
-    name: 'PGRS LAFIC API',
+    name: 'App de Bancada LAFIC API',
     status: 'running',
     endpoints: ['/api/health', '/api/measurements'],
   });

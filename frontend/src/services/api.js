@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://pgrs-lafic-backend.onrender.com';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://app-de-bancada-lafic.onrender.com';
 
 export async function fetchHealth() {
   const response = await fetch(`${API_BASE_URL}/api/health`);

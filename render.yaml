@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: pgrs-lafic-backend
+    name: app-de-bancada-lafic
     runtime: node
     rootDir: backend
     buildCommand: npm install

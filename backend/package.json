@@ -1,5 +1,5 @@
 {
-  "name": "pgrs-lafic-backend",
+  "name": "app-de-bancada-lafic",
   "version": "1.0.0",
   "description": "Backend Express para integração do LAFIC com Notion",
   "main": "index.js",

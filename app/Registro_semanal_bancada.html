@@ -6,7 +6,7 @@
   <title>Registro Semanal de Bancada - LAFIC</title>
   <meta name="api-base-url" content="">
   <script>
-    window.PGRS_API_BASE_URL = window.PGRS_API_BASE_URL || window.__PGRS_API_BASE_URL__ || 'https://pgrs-lafic-backend.onrender.com';
+    window.BANCADA_LAFIC_API_BASE_URL = window.BANCADA_LAFIC_API_BASE_URL || window.__BANCADA_LAFIC_API_BASE_URL__ || 'https://app-de-bancada-lafic.onrender.com';
   </script>
   <style>
     * {
@@ -341,7 +341,7 @@
                 <option value="">Selecione...</option>
                 <option value="T1 - Inverno (15°C)">T1 - Inverno (15°C)</option>
                 <option value="T2 - Transição (22°C)">T2 - Transição (22°C)</option>
-                <option value="T3 - Verão (28°C)">T3 - Verão/Controle (28°C)</option>
+                <option value="T3 - Verão/Controle (28°C)">T3 - Verão/Controle (28°C)</option>
               </select>
             </div>
           </div>
@@ -387,7 +387,10 @@
 
       <!-- ABA: HISTÓRICO DE MEDIÇÕES -->
       <div id="history" class="tab-content">
-        <h3 style="margin-bottom: 20px; color: var(--text-main);">📋 Medições Registradas</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+          <h3 style="color: var(--text-main);">📋 Medições Registradas</h3>
+          <button class="btn-secondary" onclick="sincronizarPendentes()">🔄 Sincronizar pendentes agora</button>
+        </div>
         <div class="table-container">
           <table id="measurementsTable">
             <thead>
@@ -400,11 +403,12 @@
                 <th>Fv/Fm</th>
                 <th>Salinidade</th>
                 <th>Responsável</th>
+                <th>Status</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">
                   Nenhuma medição registrada ainda.
                 </td>
               </tr>
@@ -419,7 +423,7 @@
           <div class="card">
             <h3>Total de Registros</h3>
             <p id="dashTotalRegistros">0</p>
-            <small>Medições cadastradas</small>
+            <small>Medições cadastradas (sincronizadas + locais)</small>
           </div>
           <div class="card success-card">
             <h3>Espécies Cobertas</h3>
@@ -427,9 +431,9 @@
             <small>Das 4 propostas</small>
           </div>
           <div class="card alert-card">
-            <h3>Dias de Experimento</h3>
-            <p id="dashDias">--</p>
-            <small>Desde o início</small>
+            <h3>Pendentes de Sincronização</h3>
+            <p id="dashPendentes">0</p>
+            <small>Salvas no navegador, aguardando internet</small>
           </div>
         </div>
       </div>
@@ -442,13 +446,33 @@
   </footer>
 
   <script>
-    const API_BASE_URL = window.PGRS_API_BASE_URL || window.__PGRS_API_BASE_URL__ || document.querySelector('meta[name="api-base-url"]')?.content || '';
+    const API_BASE_URL = window.BANCADA_LAFIC_API_BASE_URL || window.__BANCADA_LAFIC_API_BASE_URL__ || document.querySelector('meta[name="api-base-url"]')?.content || '';
+    const PENDING_KEY = 'lafic_bancada_pendentes';
 
-    // Banco de dados carregado da API quando disponível
+    // Banco de dados carregado da API (sincronizados) + fila local (pendentes)
     let measurements = [];
 
     // Definir data de hoje no formulário
     document.querySelector('input[type="date"]').valueAsDate = new Date();
+
+    // ===== FILA LOCAL (offline-first) =====
+    function getPending() {
+      try { return JSON.parse(localStorage.getItem(PENDING_KEY) || '[]'); }
+      catch (e) { return []; }
+    }
+    function setPending(arr) {
+      localStorage.setItem(PENDING_KEY, JSON.stringify(arr));
+    }
+    function addPending(record) {
+      const arr = getPending();
+      const withId = { ...record, _localId: 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), _pending: true };
+      arr.push(withId);
+      setPending(arr);
+      return withId;
+    }
+    function removePending(localId) {
+      setPending(getPending().filter(r => r._localId !== localId));
+    }
 
     async function switchTab(tabName, evt) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
@@ -470,38 +494,66 @@
       return 'badge gray';
     }
 
+    // Junta os registros já sincronizados (measurements) com os que ainda estão só no navegador (pendentes)
+    function getAllRecordsForDisplay() {
+      const pending = getPending();
+      return [...measurements, ...pending];
+    }
+
     function renderTable() {
       const tbody = document.querySelector('#measurementsTable tbody');
-      if (measurements.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada ainda.</td></tr>';
+      const all = getAllRecordsForDisplay();
+      if (all.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada ainda.</td></tr>';
         return;
       }
-      
-      tbody.innerHTML = measurements.map(m => `
+
+      tbody.innerHTML = all.map(m => `
         <tr>
           <td>${m.dataMedicao ? m.dataMedicao.split('-').reverse().join('/') : '-'}</td>
           <td><strong>${m.flaskId || '-'}</strong></td>
           <td><span class="${getEspecieBadge(m.especie || '')}">${m.especie || '-'}</span></td>
           <td>${m.tratamento || '-'}</td>
           <td>${m.pesoUmido != null ? Number(m.pesoUmido).toFixed(3) : '-'}</td>
-          <td>${m.fvfm != null ? Number(m.fvfm).toFixed(3) : '-'}</td>
+          <td>${m.fvfm != null && m.fvfm !== '' ? Number(m.fvfm).toFixed(3) : '-'}</td>
           <td>${m.salinidade || '-'}</td>
           <td>${m.responsavel || '-'}</td>
+          <td>${m._pending ? '<span class="badge yellow">⏳ Pendente</span>' : '<span class="badge green">✅ Sincronizado</span>'}</td>
         </tr>
       `).reverse().join('');
     }
 
     function updateDashboard() {
-      document.getElementById('dashTotalRegistros').textContent = measurements.length;
-      
-      const especiesUnicas = new Set(measurements.map(m => m.especie));
+      const all = getAllRecordsForDisplay();
+      document.getElementById('dashTotalRegistros').textContent = all.length;
+
+      const especiesUnicas = new Set(all.map(m => m.especie));
       document.getElementById('dashEspecies').textContent = especiesUnicas.size;
+
+      const pendingCount = getPending().length;
+      const dashPendentesEl = document.getElementById('dashPendentes');
+      if (dashPendentesEl) dashPendentesEl.textContent = pendingCount;
+    }
+
+    async function tentarEnviar(dataObj) {
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/measurements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(dataObj),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!response.ok) return false;
+        return true;
+      } catch (error) {
+        return false;
+      }
     }
 
     async function submitMeasurement(event) {
       event.preventDefault();
       const formData = new FormData(event.target);
-      
+
       const dataObj = {
         flaskId: formData.get('frasco'),
         dataMedicao: formData.get('data'),
@@ -515,27 +567,27 @@
         responsavel: formData.get('responsavel')
       };
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/measurements`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(dataObj)
-        });
+      // 1. Salva localmente PRIMEIRO — nunca perde o dado, mesmo offline
+      const localRecord = addPending(dataObj);
+      renderTable();
+      updateDashboard();
 
-        if (!response.ok) {
-          const error = await response.json().catch(() => ({}));
-          throw new Error(error.error || 'Falha ao registrar medição');
-        }
+      // 2. Tenta sincronizar imediatamente com o Notion
+      const enviado = await tentarEnviar(dataObj);
 
-        showAlert('formAlerts', '✅ Medição enviada para o Notion com sucesso!', 'success');
+      if (enviado) {
+        removePending(localRecord._localId);
+        showAlert('formAlerts', '✅ Medição enviada e sincronizada com o Notion!', 'success');
         await loadMeasurements();
-
-        event.target.reset();
-        document.querySelector('input[name="data"]').valueAsDate = new Date();
-        event.target.querySelector('input[name="frasco"]').focus();
-      } catch (error) {
-        showAlert('formAlerts', `❌ ${error.message}`, 'error');
+      } else {
+        showAlert('formAlerts', '💾 Sem conexão com a API agora — medição salva no navegador e será sincronizada automaticamente quando a internet voltar.', 'error');
+        renderTable();
+        updateDashboard();
       }
+
+      event.target.reset();
+      document.querySelector('input[name="data"]').valueAsDate = new Date();
+      event.target.querySelector('input[name="frasco"]').focus();
     }
 
     function showAlert(containerId, message, type) {
@@ -545,12 +597,33 @@
       alert.textContent = message;
       container.innerHTML = '';
       container.appendChild(alert);
-      setTimeout(() => alert.remove(), 3000);
+      setTimeout(() => alert.remove(), 4000);
+    }
+
+    // Tenta sincronizar tudo que está pendente na fila local (chamado ao reconectar ou manualmente)
+    async function sincronizarPendentes() {
+      const pending = getPending();
+      if (pending.length === 0) {
+        showAlert('formAlerts', 'Nenhuma medição pendente para sincronizar.', 'success');
+        return;
+      }
+      let sucesso = 0;
+      for (const record of pending) {
+        const { _localId, _pending, ...payload } = record;
+        const ok = await tentarEnviar(payload);
+        if (ok) { removePending(_localId); sucesso++; }
+      }
+      if (sucesso > 0) {
+        showAlert('formAlerts', `✅ ${sucesso} medição(ões) sincronizada(s) com o Notion.`, 'success');
+      } else {
+        showAlert('formAlerts', '❌ Ainda sem conexão com a API — tentaremos de novo mais tarde.', 'error');
+      }
+      await loadMeasurements();
     }
 
     async function loadMeasurements() {
       try {
-        const response = await fetch(`${API_BASE_URL}/api/measurements`);
+        const response = await fetch(`${API_BASE_URL}/api/measurements`, { signal: AbortSignal.timeout(15000) });
         if (!response.ok) {
           throw new Error('API indisponível');
         }
@@ -561,11 +634,19 @@
         document.getElementById('apiStatus').classList.remove('error');
         document.querySelector('.status-indicator').classList.remove('error');
         document.querySelector('.status-text h3').textContent = 'API Conectada';
-        document.querySelector('.status-text p').textContent = 'Os dados estão sendo lidos diretamente do backend';
+        const pendCount = getPending().length;
+        document.querySelector('.status-text p').textContent = pendCount > 0
+          ? `Conectado — ${pendCount} medição(ões) local(is) aguardando sincronização`
+          : 'Os dados estão sendo lidos diretamente do backend';
+
+        // se reconectou e tem pendente, tenta sincronizar sozinho
+        if (pendCount > 0) sincronizarPendentes();
       } catch (error) {
+        renderTable();
+        updateDashboard();
         document.getElementById('apiStatus').classList.add('error');
         document.querySelector('.status-indicator').classList.add('error');
-        document.querySelector('.status-text h3').textContent = 'Modo local';
+        document.querySelector('.status-text h3').textContent = 'Modo local (offline)';
         document.querySelector('.status-text p').textContent = 'A API ainda não respondeu; o formulário continua disponível.';
       }
     }
@@ -591,6 +672,9 @@
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
       updateBtnVisual(isDark);
     });
+
+    // Ao voltar a conexão com a internet, tenta sincronizar sozinho
+    window.addEventListener('online', sincronizarPendentes);
 
     loadMeasurements();
   </script>

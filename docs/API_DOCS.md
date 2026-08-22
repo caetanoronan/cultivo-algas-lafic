@@ -6,11 +6,11 @@ Retorna o status do servidor.
 
 ## `GET /api/measurements`
 
-Lista medições registradas no Notion.
+Lista medicoes registradas no Notion.
 
 ## `POST /api/measurements`
 
-Registra uma nova medição.
+Registra uma nova medicao.
 
 ### Corpo esperado
 
