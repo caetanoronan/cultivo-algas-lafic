@@ -7,10 +7,20 @@ const measurementsRoutes = require('./routes/measurements');
 
 const app = express();
 const corsOrigin = process.env.CORS_ORIGIN || '*';
-const allowedOrigins = corsOrigin
-  .split(',')
-  .map((origin) => origin.trim().replace(/\/$/, ''))
-  .filter(Boolean);
+const normalizeOrigin = (origin) => {
+  const trimmedOrigin = origin.trim().replace(/\/$/, '');
+
+  try {
+    return new URL(trimmedOrigin).origin;
+  } catch (error) {
+    return trimmedOrigin;
+  }
+};
+
+const allowedOrigins = [
+  'https://caetanoronan.github.io',
+  ...corsOrigin.split(',').map(normalizeOrigin),
+].filter(Boolean);
 
 app.use(cors({
   origin(origin, callback) {
@@ -18,7 +28,7 @@ app.use(cors({
       return callback(null, true);
     }
 
-    const normalizedOrigin = origin.replace(/\/$/, '');
+    const normalizedOrigin = normalizeOrigin(origin);
     if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
