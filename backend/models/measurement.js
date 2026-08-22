@@ -1,18 +1,31 @@
+const PROPERTIES = {
+  flaskId: 'C\u00f3digo do Frasco',
+  dataMedicao: 'Data da Medi\u00e7\u00e3o',
+  especie: 'Esp\u00e9cie',
+  tratamento: 'Tratamento',
+  pesoUmido: 'Peso \u00damido (g)',
+  fvfm: 'Fv/Fm',
+  salinidade: 'Salinidade',
+  temperatura: 'Temperatura',
+  observacoes: 'Observa\u00e7\u00f5es',
+  responsavel: 'Respons\u00e1vel',
+};
+
 function toMeasurementResponse(page) {
   const properties = page.properties;
 
   return {
     id: page.id,
-    flaskId: properties['Código do Frasco']?.title?.[0]?.plain_text || '',
-    dataMedicao: properties['Data da Medição']?.date?.start || null,
-    especie: properties['Espécie']?.select?.name || '',
-    tratamento: properties['Tratamento']?.select?.name || '',
-    pesoUmido: properties['Peso Úmido (g)']?.number ?? null,
-    fvfm: properties['Fv/Fm']?.number ?? null,
-    salinidade: properties['Salinidade']?.number ?? null,
-    temperatura: properties['Temperatura']?.number ?? null,
-    observacoes: properties['Observações']?.rich_text?.[0]?.plain_text || '',
-    responsavel: properties['Responsável']?.rich_text?.[0]?.plain_text || '',
+    flaskId: properties[PROPERTIES.flaskId]?.title?.[0]?.plain_text || '',
+    dataMedicao: properties[PROPERTIES.dataMedicao]?.date?.start || null,
+    especie: properties[PROPERTIES.especie]?.select?.name || '',
+    tratamento: properties[PROPERTIES.tratamento]?.select?.name || '',
+    pesoUmido: properties[PROPERTIES.pesoUmido]?.number ?? null,
+    fvfm: properties[PROPERTIES.fvfm]?.number ?? null,
+    salinidade: properties[PROPERTIES.salinidade]?.number ?? null,
+    temperatura: properties[PROPERTIES.temperatura]?.number ?? null,
+    observacoes: properties[PROPERTIES.observacoes]?.rich_text?.[0]?.plain_text || '',
+    responsavel: properties[PROPERTIES.responsavel]?.rich_text?.[0]?.plain_text || '',
   };
 }
 
@@ -31,34 +44,34 @@ function toMeasurementPageProperties(measurement) {
   } = measurement;
 
   return {
-    'Código do Frasco': {
+    [PROPERTIES.flaskId]: {
       title: [{ text: { content: flaskId } }],
     },
-    'Data da Medição': {
+    [PROPERTIES.dataMedicao]: {
       date: { start: dataMedicao },
     },
-    'Espécie': {
+    [PROPERTIES.especie]: {
       select: { name: especie },
     },
-    'Tratamento': {
+    [PROPERTIES.tratamento]: {
       select: { name: tratamento },
     },
-    'Peso Úmido (g)': {
+    [PROPERTIES.pesoUmido]: {
       number: Number(pesoUmido),
     },
-    'Fv/Fm': {
+    [PROPERTIES.fvfm]: {
       number: fvfm === '' || fvfm == null ? null : Number(fvfm),
     },
-    'Salinidade': {
+    [PROPERTIES.salinidade]: {
       number: salinidade === '' || salinidade == null ? null : Number(salinidade),
     },
-    'Temperatura': {
+    [PROPERTIES.temperatura]: {
       number: temperatura === '' || temperatura == null ? null : Number(temperatura),
     },
-    'Observações': {
+    [PROPERTIES.observacoes]: {
       rich_text: [{ text: { content: observacoes || '' } }],
     },
-    'Responsável': {
+    [PROPERTIES.responsavel]: {
       rich_text: [{ text: { content: responsavel || '' } }],
     },
   };
