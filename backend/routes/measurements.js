@@ -17,6 +17,7 @@ router.post('/', async (req, res) => {
   try {
     const {
       flaskId,
+      experimento,
       dataMedicao,
       especie,
       tratamento,
@@ -36,6 +37,7 @@ router.post('/', async (req, res) => {
 
     const createdPage = await createMeasurement({
       flaskId,
+      experimento,
       dataMedicao,
       especie,
       tratamento,

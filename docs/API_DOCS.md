@@ -15,6 +15,7 @@ Registra uma nova medicao.
 ### Corpo esperado
 
 - `flaskId`
+- `experimento`
 - `dataMedicao`
 - `especie`
 - `tratamento`

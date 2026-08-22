@@ -50,6 +50,7 @@ A base do Notion precisa ter exatamente estas colunas:
 
 | Coluna | Tipo no Notion |
 | --- | --- |
+| `Experimento` | Selecao |
 | `Código do Frasco` | Titulo |
 | `Data da Medição` | Data |
 | `Espécie` | Selecao |
@@ -64,6 +65,7 @@ A base do Notion precisa ter exatamente estas colunas:
 Observacao: no codigo, os nomes sao enviados ao Notion com acentos corretos usando escapes Unicode para evitar problemas de codificacao. No Notion, os nomes visiveis devem ser exatamente:
 
 ```text
+Experimento
 Código do Frasco
 Data da Medição
 Espécie

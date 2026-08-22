@@ -325,6 +325,13 @@
 
           <div class="form-grid">
             <div class="form-group">
+              <label>Experimento *</label>
+              <select name="experimento" required>
+                <option value="Bancada padrão LAFIC" selected>Bancada padrão LAFIC</option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label>Espécie *</label>
               <select name="especie" required>
                 <option value="">Selecione...</option>
@@ -396,6 +403,7 @@
             <thead>
               <tr>
                 <th>Data</th>
+                <th>Experimento</th>
                 <th>Frasco</th>
                 <th>Espécie</th>
                 <th>Tratamento</th>
@@ -408,7 +416,7 @@
             </thead>
             <tbody>
               <tr>
-                <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px;">
                   Nenhuma medição registrada ainda.
                 </td>
               </tr>
@@ -504,13 +512,14 @@
       const tbody = document.querySelector('#measurementsTable tbody');
       const all = getAllRecordsForDisplay();
       if (all.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada ainda.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhuma medição registrada ainda.</td></tr>';
         return;
       }
 
       tbody.innerHTML = all.map(m => `
         <tr>
           <td>${m.dataMedicao ? m.dataMedicao.split('-').reverse().join('/') : '-'}</td>
+          <td>${m.experimento || 'Bancada padrão LAFIC'}</td>
           <td><strong>${m.flaskId || '-'}</strong></td>
           <td><span class="${getEspecieBadge(m.especie || '')}">${m.especie || '-'}</span></td>
           <td>${m.tratamento || '-'}</td>
@@ -556,6 +565,7 @@
 
       const dataObj = {
         flaskId: formData.get('frasco'),
+        experimento: formData.get('experimento') || 'Bancada padrão LAFIC',
         dataMedicao: formData.get('data'),
         especie: formData.get('especie'),
         tratamento: formData.get('tratamento'),

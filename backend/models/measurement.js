@@ -1,4 +1,5 @@
 const PROPERTIES = {
+  experimento: 'Experimento',
   flaskId: 'C\u00f3digo do Frasco',
   dataMedicao: 'Data da Medi\u00e7\u00e3o',
   especie: 'Esp\u00e9cie',
@@ -16,6 +17,7 @@ function toMeasurementResponse(page) {
 
   return {
     id: page.id,
+    experimento: properties[PROPERTIES.experimento]?.select?.name || '',
     flaskId: properties[PROPERTIES.flaskId]?.title?.[0]?.plain_text || '',
     dataMedicao: properties[PROPERTIES.dataMedicao]?.date?.start || null,
     especie: properties[PROPERTIES.especie]?.select?.name || '',
@@ -32,6 +34,7 @@ function toMeasurementResponse(page) {
 function toMeasurementPageProperties(measurement) {
   const {
     flaskId,
+    experimento = 'Bancada padr\u00e3o LAFIC',
     dataMedicao,
     especie,
     tratamento,
@@ -44,6 +47,9 @@ function toMeasurementPageProperties(measurement) {
   } = measurement;
 
   return {
+    [PROPERTIES.experimento]: {
+      select: { name: experimento },
+    },
     [PROPERTIES.flaskId]: {
       title: [{ text: { content: flaskId } }],
     },
