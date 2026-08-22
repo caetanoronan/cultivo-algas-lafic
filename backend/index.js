@@ -7,8 +7,25 @@ const measurementsRoutes = require('./routes/measurements');
 
 const app = express();
 const corsOrigin = process.env.CORS_ORIGIN || '*';
+const allowedOrigins = corsOrigin
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/$/, ''))
+  .filter(Boolean);
 
-app.use(cors({ origin: corsOrigin === '*' ? '*' : corsOrigin.split(',').map((origin) => origin.trim()) }));
+app.use(cors({
+  origin(origin, callback) {
+    if (corsOrigin === '*' || !origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(null, false);
+  },
+}));
 app.use(express.json());
 
 app.get('/', (req, res) => {
